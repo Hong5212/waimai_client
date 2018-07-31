@@ -9,7 +9,7 @@
 
   export default {
     mounted(){
-      // 更新state
+
       return this.$store.dispatch('getAddress')
     },
 

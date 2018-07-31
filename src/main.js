@@ -11,5 +11,5 @@ new Vue({
   el: '#app',
   render: h => h(app),
   router, // 配置路由器
-  store, // 注册store
+  store, // 注册store, 全局都有一个$store
 })
