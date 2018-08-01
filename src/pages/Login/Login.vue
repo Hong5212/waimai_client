@@ -39,7 +39,7 @@
               </section>
               <section class="login_message">
                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                <img class="get_verification" src="http://localhost:4000/captcha"
+                <img ref="captcha" class="get_verification" src="http://localhost:4000/captcha"
                      alt="captcha" @click="updateCaptacha">
               </section>
             </section>
@@ -55,9 +55,9 @@
   </section>
 </template>
 <script>
-  import { Toast, MessageBox } from 'mint-ui';
+  import {Toast, MessageBox} from 'mint-ui';
 
-  import {reqSendCode} from '../../api'
+  import {reqSendCode, reqSmsLogin, reqPwdLogin} from '../../api'
 
   export default {
     data() {
@@ -80,53 +80,94 @@
     },
 
     methods: {
+      // 现实提示消息
+      showAlert(msg) {
+        MessageBox.alert(msg, '提示');
+      },
+
       // 登陆请求
-      login(){
-        let {phone, code, name, pwd, captcha} = this
+      async login() {
+        const {phone, code, name, pwd, captcha} = this
+        let reslut
         // 1. 前台表单验证
-        if(this.loginWay){ // 短信登录
-          if(!this.isRightPhone){
-            MessageBox.alert('请输入正确手机号', '提示');
-          }else if(!/^\d{6}$/.test(code)){
-            MessageBox.alert('验证码错误', '提示');
+        if (this.loginWay) { // 短信登录
+
+          if (!this.isRightPhone) {
+            // MessageBox.alert('请输入正确手机号', '提示');
+            this.showAlert('请输入正确手机号')
+            return
+          } else if (!/^\d{6}$/.test(code)) {
+            // MessageBox.alert('验证码错误', '提示');
+            this.showAlert('验证码错误')
+            return
           }
-        }else{
-          if(!name){
-            MessageBox.alert('请输入用户名', '提示');
-          }else if(!pwd){
-            MessageBox.alert('请输入密码', '提示');
-          }else if(!captcha){
-            MessageBox.alert('请输入验证码', '提示');
+           // 2. 发登陆请求(短信)
+          reslut = await reqSmsLogin(phone, code)
+
+        } else { //密码登录
+
+          if (!name) {
+            // MessageBox.alert('请输入用户名', '提示');
+            this.showAlert('请输入用户名')
+            return
+          } else if (!pwd) {
+            // MessageBox.alert('请输入密码', '提示');
+            this.showAlert('请输入密码')
+            return
+          } else if (!captcha) {
+            // MessageBox.alert('请输入验证码', '提示');
+            this.showAlert('请输入验证码')
+            return
           }
+          // 2. 发登录请求(密码)
+          reslut = await reqPwdLogin({name, pwd, captcha})
         }
 
-        // 2. 发登陆请求(密码)
+        // 3. 根据结果做不同响应
+        if(reslut.code === 0){ // 成功
+          const user = reslut.data;
 
+          // 将user保存到state中
+          this.$store.dispatch('saveUser', user)
+          // 跳转路由到/profile
+          this.$router.replace('/profile')
+
+        }else{ // 失败
+          this.showAlert(reslut.msg)
+
+          // 停止计时
+          this.computeTime = 0;
+
+          // 更新图形验证码(必须是密码登录)
+          !this.loginWay && this.updateCaptacha()
+        }
       },
 
       // 发送验证
-      async sendCode() {
-        //  1. 倒计时
-        //  指定总时间
-        this.computeTime = 10
-        // 启动循环定时器，每隔1s减少1
-        if (this.computeTime) {
+      async sendCode(event) {
+        if (this.isRightPhone) {
+          //  1. 倒计时
+          //  指定总时间
+          event.target.className = 'get_verification'
+          this.computeTime = 10
+          // 启动循环定时器，每隔1s减少1
           const interId = setInterval(() => {
             this.computeTime--
             // 当计时时间为0时清除定时器
             if (this.computeTime <= 0) {
               this.computeTime = 0;
               clearInterval(interId)
+              event.target.className = 'get_verification right_phone'
             }
           }, 1000)
 
           //2. 向后台发ajax请求--> 发送获取验证码的请求
           const result = await reqSendCode(this.phone)
 
-          if(result.code === 0){
+          if (result.code === 0) {
             // 显示一个自自动消失的文本小提示
             Toast('短信已发送');
-          }else {
+          } else {
             // 停止计时
             this.computeTime = 0  // 前面判断的条件必须是<=
             // 显示一个警告框
@@ -136,11 +177,11 @@
       },
 
       // 获取更新显示新的图形验证码
-      updateCaptacha(event){
-        // console.log(event.target.src);
+      updateCaptacha() {
+        // event.target.src = 'http://localhost:4000/captcha'
         // 如果指定的新的src与原本的src一样, 不会重新请求
         // 参数本身后台不需要, 但有了这个变化的值, 浏览器就会自动发请求
-        event.target.src = 'http://localhost:4000/captcha?' + Date.now()
+        this.$refs.captcha.src = 'http://localhost:4000/captcha?' + Date.now()
       }
     }
   }
