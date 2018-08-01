@@ -4,16 +4,18 @@
       <div class="login_header">
         <h2 class="login_logo">硅谷外卖</h2>
         <div class="login_header_title">
-          <a href="javascript:;" class="on">短信登录</a>
-          <a href="javascript:;">密码登录</a>
+          <a href="javascript:;" :class="{on: loginWay}" @click="loginWay = true">短信登录</a>
+          <a href="javascript:;" :class="{on: !loginWay}" @click="loginWay = false">密码登录</a>
         </div>
       </div>
       <div class="login_content">
         <form>
-          <div class="on">
+          <div :class="{on: loginWay}">
             <section class="login_message">
-              <input type="tel" maxlength="11" placeholder="手机号">
-              <button disabled="disabled" class="get_verification">获取验证码</button>
+              <input type="tel" maxlength="11" placeholder="手机号" v-model="phone">
+              <button :disabled="!isRightPhone" class="get_verification" :class="{right_phone: isRightPhone}"
+                      @click.prevent="sendCode">{{computeTime>0?`已发送(${computeTime}s)`:'发送验证码'}}
+              </button>
             </section>
             <section class="login_verification">
               <input type="tel" maxlength="8" placeholder="验证码">
@@ -23,17 +25,22 @@
               <a href="javascript:;">《用户服务协议》</a>
             </section>
           </div>
-          <div>
+          <div :class="{on: !loginWay}">
             <section>
               <section class="login_message">
                 <input type="tel" maxlength="11" placeholder="手机/邮箱/用户名">
               </section>
               <section class="login_verification">
-                <input type="tel" maxlength="8" placeholder="密码">
-                <div class="switch_button off">
-                  <div class="switch_circle"></div>
-                  <span class="switch_text">...</span>
+                <input :type="isShowPwd?'text':'password'" maxlength="8" placeholder="密码">
+                <div class="switch_button" :class="{on: isShowPwd}" @click="isShowPwd = !isShowPwd">
+                  <div class="switch_circle" :class="{right: isShowPwd}"></div>
+                  <span class="switch_text">abc</span>
                 </div>
+              </section>
+              <section class="login_message">
+                <input type="text" maxlength="11" placeholder="验证码">
+                <img class="get_verification" src="http://localhost:4000/captcha"
+                     alt="captcha" @click="updateCaptacha">
               </section>
             </section>
           </div>
@@ -48,7 +55,65 @@
   </section>
 </template>
 <script>
-  export default {}
+  import {reqSendCode} from '../../api'
+
+  export default {
+    data() {
+      return {
+        loginWay: false, // true代表短信登陆, false代表密码登陆
+        phone: '',  // 手机号
+        pwd: '',
+        computeTime: 0, // 倒计时剩余的时间
+        isShowPwd: true // 是否显示密码
+      }
+    },
+
+    computed: {
+      isRightPhone() {
+        return /^1\d{10}$/.test(this.phone) // 匹配以1开头的11位数字
+      }
+    },
+
+    methods: {
+      async sendCode() {
+        //  1. 倒计时
+        //  指定总时间
+        this.computeTime = 10
+        // 启动循环定时器，每隔1s减少1
+        if (this.computeTime) {
+          const interId = setInterval(() => {
+            this.computeTime--
+            // 当计时时间为0时清除定时器
+            if (this.computeTime <= 0) {
+              this.computeTime = 0;
+              clearInterval(interId)
+            }
+          }, 1000)
+
+          //2. 向后台发ajax请求--> 发送获取验证码的请求
+          const result = await reqSendCode(this.phone)
+
+          if(result.code === 0){
+            // 显示一个自自动消失的文本小提示
+            alert('已发送')
+          }else {
+            // 显示一个警告框
+            alert(result.msg)
+            // 停止计时
+            this.computeTime = 0  // 前面判断的条件必须是<=
+          }
+        }
+      },
+
+      // 获取更新显示新的图形验证码
+      updateCaptacha(event){
+        // console.log(event.target.src);
+        // 如果指定的新的src与原本的src一样, 不会重新请求
+        // 参数本身后台不需要, 但有了这个变化的值, 浏览器就会自动发请求
+        event.target.src = 'http://localhost:4000/captcha?' + Date.now()
+      }
+    }
+  }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
   .loginContainer
@@ -110,6 +175,9 @@
                 color #cccccc
                 font-size 0.14rem
                 background transparent
+                &.right_phone
+                  color #000000
+
             .login_verification
               position relative
               margin-top 0.16rem
@@ -138,7 +206,6 @@
                 &.on
                   background #02a774
                 > .switch_circle
-                  //transform translateX(27px)
                   position absolute
                   top -0.01rem
                   left -0.01rem
@@ -148,7 +215,9 @@
                   border-radius 50%
                   background #ffffff
                   box-shadow 0 0.02rem 0.04rem 0 rgba(0, 0, 0, .1)
-                  transiton transform .3s
+                  transiton transform .4s
+                  &.right
+                    transform translateX(0.26rem)
             .login_hint
               margin-top 0.12rem
               color #999999

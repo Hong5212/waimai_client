@@ -14,14 +14,14 @@
     <nav class="msite_nav border-1px">
       <div class="swiper-container">
         <div class="swiper-wrapper">
-          <div class="swiper-slide">
-            <a href="javascript:" class="link_to_food">
+          <div class="swiper-slide" v-for="(categorys, index) in categorysArr" :key="index">
+            <a href="javascript:" class="link_to_food" v-for="(category, index) in categorys" :key="index">
               <div class="food_container">
-                <img src="./images/nav/1.jpg">
+                <img :src="baseImgUrl + category.image_url">
               </div>
-              <span>甜品饮品</span>
+              <span>{{category.title}}</span>
             </a>
-            <a href="javascript:" class="link_to_food">
+            <!--<a href="javascript:" class="link_to_food">
               <div class="food_container">
                 <img src="./images/nav/2.jpg">
               </div>
@@ -62,9 +62,9 @@
                 <img src="./images/nav/8.jpg">
               </div>
               <span>土豪推荐</span>
-            </a>
+            </a>-->
           </div>
-          <div class="swiper-slide">
+          <!--<div class="swiper-slide">
             <a href="javascript:" class="link_to_food">
               <div class="food_container">
                 <img src="./images/nav/9.jpg">
@@ -113,7 +113,7 @@
               </div>
               <span>土豪推荐</span>
             </a>
-          </div>
+          </div>-->
         </div>
         <!-- Add Pagination -->
         <div class="swiper-pagination"></div>
@@ -139,22 +139,79 @@
 
   export default {
 
-    computed: {
-      ...mapState(['address'])
+    data() {
+      return {
+        baseImgUrl: 'https://fuss10.elemecdn.com'
+      }
     },
 
-    mounted(){
+    computed: {
+      ...mapState(['address', 'categorys']),
+
+      // 根据一维数据categorys生成一个二维数组categorysArr
+      categorysArr() {
+        // 二维空数组
+        const arr = [];
+
+        // 内部小空数组
+        let smallArr = [];
+
+        // 遍历一维数组
+        this.categorys.forEach(c => {
+
+          // 将空/新的数组需要放到大数组
+          if (smallArr.length === 0) {
+            arr.push(smallArr)
+          }
+
+          // 保存到小数组中
+          smallArr.push(c)
+
+          if (smallArr.length === 8) {
+            smallArr = []
+          }
+        })
+
+        // console.log(arr);
+        return arr
+      },
+    },
+
+    mounted() {
       // 请求后台获取shops
       this.$store.dispatch('getShops')
 
-      var mySwiper = new Swiper ('.swiper-container', {
-        loop: true, // 循环
+      // 请求后台获取categorys
+      this.$store.dispatch('getCategorys')
 
-        // 如果需要分页器
-        pagination: {
-          el: '.swiper-pagination',
-        },
-      })
+      // 使用定时器不是太好(时间不好判断)
+      /*setTimeout(() => {
+        // 创建Swiper的实例对象, 实现轮播(必须在列表数据显示之后)
+        new Swiper('.swiper-container', {
+          loop: true, // 循环轮播
+          pagination: {  // 分页器
+            el: '.swiper-pagination',
+          },
+        })
+      }, 1000)*/
+    },
+
+    watch: {
+      // watch的回调函数是同步执行的
+      categorys(val) { // categorys已更新到状态中了, 后面才异步更新界面
+
+        // 调用 vm.$nextTick( [callback] )  将回调延迟到下次 DOM 更新循环之后执行。在修改数据之后立即使用它
+        this.$nextTick(()=>{
+
+          new Swiper('.swiper-container', {
+            loop: true, // 循环
+            // 如果需要分页器
+            pagination: {
+              el: '.swiper-pagination',
+            },
+          })
+        })
+      }
     },
 
     components: {
@@ -166,7 +223,7 @@
 <style lang="stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixins.styl"
 
-  .msite  //首页
+  .msite //首页
     width 100%
     .msite_nav
       bottom-border-1px(#e4e4e4)
@@ -203,7 +260,7 @@
                 font-size 0.13rem
                 color #666666
         .swiper-pagination
-          >span.swiper-pagination-bullet-active
+          > span.swiper-pagination-bullet-active
             background #02a774
     .msite_shop_list
       top-border-1px(#e4e4e4)
