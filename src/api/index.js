@@ -16,7 +16,7 @@ export const reqShops = (latitude, longitude) => ajax('/api/shops', {latitude, l
 // 4、根据经纬度和关键字搜索商铺列表<br/>
 
 // 6、用户名密码登陆<br/>
-export const reqPwdLogin = ({name, pwd}) => ajax('/api/login_pwd', {name, pwd}, 'POST')
+export const reqPwdLogin = ({name, pwd, captcha}) => ajax('/api/login_pwd', {name, pwd, captcha}, 'POST')
 
 // 7、发送短信验证码<br/>
 export const reqSendCode = (phone) => ajax('/api/sendcode', {phone})

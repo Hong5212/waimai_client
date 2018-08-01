@@ -18,7 +18,7 @@
               </button>
             </section>
             <section class="login_verification">
-              <input type="tel" maxlength="8" placeholder="验证码">
+              <input type="tel" maxlength="8" placeholder="验证码" v-model="code">
             </section>
             <section class="login_hint">
               温馨提示：未注册硅谷外卖帐号的手机号，登录时将自动注册，且代表已同意
@@ -28,23 +28,23 @@
           <div :class="{on: !loginWay}">
             <section>
               <section class="login_message">
-                <input type="tel" maxlength="11" placeholder="手机/邮箱/用户名">
+                <input type="tel" maxlength="11" placeholder="手机/邮箱/用户名" v-model="name">
               </section>
               <section class="login_verification">
-                <input :type="isShowPwd?'text':'password'" maxlength="8" placeholder="密码">
+                <input :type="isShowPwd?'text':'password'" maxlength="8" placeholder="密码" v-model="pwd">
                 <div class="switch_button" :class="{on: isShowPwd}" @click="isShowPwd = !isShowPwd">
                   <div class="switch_circle" :class="{right: isShowPwd}"></div>
                   <span class="switch_text">abc</span>
                 </div>
               </section>
               <section class="login_message">
-                <input type="text" maxlength="11" placeholder="验证码">
+                <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
                 <img class="get_verification" src="http://localhost:4000/captcha"
                      alt="captcha" @click="updateCaptacha">
               </section>
             </section>
           </div>
-          <button class="login_submit">登录</button>
+          <button class="login_submit" @click.prevent="login">登录</button>
         </form>
         <a href="javascript:;" class="about_us">关于我们</a>
       </div>
@@ -55,14 +55,19 @@
   </section>
 </template>
 <script>
+  import { Toast, MessageBox } from 'mint-ui';
+
   import {reqSendCode} from '../../api'
 
   export default {
     data() {
       return {
-        loginWay: false, // true代表短信登陆, false代表密码登陆
+        loginWay: true, // true代表短信登陆, false代表密码登陆
         phone: '',  // 手机号
-        pwd: '',
+        code: '', // 短信验证码
+        name: '', // 用户名
+        pwd: '',    // 密码
+        captcha: '',  // 图形验证码
         computeTime: 0, // 倒计时剩余的时间
         isShowPwd: true // 是否显示密码
       }
@@ -75,6 +80,31 @@
     },
 
     methods: {
+      // 登陆请求
+      login(){
+        let {phone, code, name, pwd, captcha} = this
+        // 1. 前台表单验证
+        if(this.loginWay){ // 短信登录
+          if(!this.isRightPhone){
+            MessageBox.alert('请输入正确手机号', '提示');
+          }else if(!/^\d{6}$/.test(code)){
+            MessageBox.alert('验证码错误', '提示');
+          }
+        }else{
+          if(!name){
+            MessageBox.alert('请输入用户名', '提示');
+          }else if(!pwd){
+            MessageBox.alert('请输入密码', '提示');
+          }else if(!captcha){
+            MessageBox.alert('请输入验证码', '提示');
+          }
+        }
+
+        // 2. 发登陆请求(密码)
+
+      },
+
+      // 发送验证
       async sendCode() {
         //  1. 倒计时
         //  指定总时间
@@ -95,12 +125,12 @@
 
           if(result.code === 0){
             // 显示一个自自动消失的文本小提示
-            alert('已发送')
+            Toast('短信已发送');
           }else {
-            // 显示一个警告框
-            alert(result.msg)
             // 停止计时
             this.computeTime = 0  // 前面判断的条件必须是<=
+            // 显示一个警告框
+            MessageBox.alert(result.msg, '提示');
           }
         }
       },
