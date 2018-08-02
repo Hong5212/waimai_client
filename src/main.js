@@ -16,6 +16,9 @@ Vue.component(Button.name, Button);
 
 new Vue({
   el: '#app',
+  /*render: function (h) {
+    return h(app)
+  },*/
   render: h => h(app),
   router, // 配置路由器
   store, // 注册store, 全局都有一个$store
