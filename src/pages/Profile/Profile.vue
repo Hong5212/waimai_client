@@ -93,6 +93,7 @@
   </section>
 </template>
 <script>
+  // 引入头部
   import HeaderTop from '../../components/HeaderTop/HeaderTop'
 
   export default {
