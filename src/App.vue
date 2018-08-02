@@ -9,8 +9,10 @@
 
   export default {
     mounted(){
-      // 更新state
-      return this.$store.dispatch('getAddress')
+      // 异步获取当前地址信息
+      this.$store.dispatch('getAddress')
+      // 异步获取用户信息
+      this.$store.dispatch('getUser')
     },
 
     components: {
