@@ -8,7 +8,7 @@ import app from './App'
 import router from './router'
 import store from './store'
 
-// 使用mint-ui
+// 注册全局组件标签
 Vue.component(Button.name, Button);
 
 new Vue({

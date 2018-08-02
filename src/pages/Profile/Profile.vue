@@ -112,11 +112,11 @@
       logout() {
         MessageBox.confirm('你确认退出吗?')
           .then(
-            action => {
+            action => { // 确认
               // 异步获取用户信息
               this.$store.dispatch('resetUser')
             },
-            action => {
+            action => { // 取消
               console.log('点击了取消');
             }
           );
