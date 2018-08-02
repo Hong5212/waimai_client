@@ -62,7 +62,7 @@
   export default {
     data() {
       return {
-        loginWay: true, // true代表短信登陆, false代表密码登陆
+        loginWay: false, // true代表短信登陆, false代表密码登陆
         phone: '',  // 手机号
         code: '', // 短信验证码
         name: '', // 用户名
@@ -181,7 +181,7 @@
         // event.target.src = 'http://localhost:4000/captcha'
         // 如果指定的新的src与原本的src一样, 不会重新请求
         // 参数本身后台不需要, 但有了这个变化的值, 浏览器就会自动发请求
-        this.$refs.captcha.src = 'http://localhost:4000/captcha?' + Date.now()
+        this.$refs.captcha.src = 'http://localhost:4000/captcha?time=' + Date.now()
       }
     }
   }

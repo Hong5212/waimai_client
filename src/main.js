@@ -2,10 +2,14 @@
 入口js
  */
 import Vue from 'vue'
+import {Button} from 'mint-ui'
 
 import app from './App'
 import router from './router'
 import store from './store'
+
+// 使用mint-ui
+Vue.component(Button.name, Button);
 
 new Vue({
   el: '#app',
