@@ -79,12 +79,13 @@ export default {
   },
 
   // 异步获取点餐分类列表
-  async getGoods({commit, state}) {
+  async getGoods({commit, state}, callback) {
     // 调用接口请求函数从后台获取数据
     const reslut = await reqGoods()  // {code: 0, data: []}
     if (reslut.code === 0) {
       const goods = reslut.data
-      commit(RECEIVE_GOODS, {goods})
+      commit(RECEIVE_GOODS, {goods});
+      callback && callback();
     }
   },
 
