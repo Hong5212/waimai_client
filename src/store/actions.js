@@ -3,14 +3,20 @@ import {
   RECEIVE_CATEGORYS,
   RECEIVE_SHOPS,
   RECEIVE_USER,
-  RESET_USER
+  RESET_USER,
+  RECEIVE_GOODS,
+  RECEIVE_RATINGS,
+  RECEIVE_INFO
 } from './mutation-types'
 import {
   reqAddress,
   reqCategorys,
   reqShops,
   reqUser,
-  logout
+  logout,
+  reqGoods,
+  reqRatings,
+  reqInfo
 } from '../api'
 
 export default {
@@ -69,6 +75,36 @@ export default {
     const reslut = await logout()  // {code: 0, data: {}}
     if (reslut.code === 0) {
       commit(RESET_USER)
+    }
+  },
+
+  // 异步获取点餐分类列表
+  async getGoods({commit, state}) {
+    // 调用接口请求函数从后台获取数据
+    const reslut = await reqGoods()  // {code: 0, data: []}
+    if (reslut.code === 0) {
+      const goods = reslut.data
+      commit(RECEIVE_GOODS, {goods})
+    }
+  },
+
+  // 异步获取评论列表
+  async getRatings({commit, state}) {
+    // 调用接口请求函数从后台获取数据
+    const reslut = await reqRatings()  // {code: 0, data: []}
+    if (reslut.code === 0) {
+      const ratings = reslut.data
+      commit(RECEIVE_RATINGS, {ratings})
+    }
+  },
+
+  // 异步获取商家消息
+  async getInfo({commit, state}) {
+    // 调用接口请求函数从后台获取数据
+    const reslut = await reqInfo()  // { code: 0, data: {} }
+    if (reslut.code === 0) {
+      const info = reslut.data
+      commit(RECEIVE_INFO, {info})
     }
   },
 }

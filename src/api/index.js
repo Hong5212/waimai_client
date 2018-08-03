@@ -29,3 +29,7 @@ export const reqUser = () => ajax('/api/userinfo')
 
 // 10、用户登出<br/>
 export const logout = () => ajax('/api/logout')
+
+export const reqGoods = () => ajax('/goods')
+export const reqRatings = () => ajax('/ratings')
+export const reqInfo = () => ajax('/info')
