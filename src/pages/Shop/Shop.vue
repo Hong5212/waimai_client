@@ -37,6 +37,7 @@
   .tab
     height 0.4rem
     line-height 0.4rem
+    background #fff
     bottom-border-1px(rgba(7, 17, 27, 0.1))
     .tab-item
       float left

@@ -4,48 +4,56 @@
 
       <div class="overview">
         <div class="overview-left">
-          <h1 class="score">4.5</h1>
+          <h1 class="score">{{info.ratingCount}}</h1>
           <div class="title">综合评分</div>
           <div class="rank">高于周边商家90%</div>
         </div>
         <div class="overview-right">
           <div class="score-wrapper">
             <span class="title">服务态度</span>
-            <Star/>
-            <span class="score">4.4</span>
+            <Star :score="info.serviceScore" :size="36"/>
+            <span class="score">{{info.serviceScore}}</span>
           </div>
           <div class="score-wrapper">
             <span class="title">商品评分</span>
-            <Star/>
-            <span class="score">4.6</span></div>
+            <Star :score="info.foodScore" :size="36"/>
+            <span class="score">{{info.foodScore}}</span></div>
           <div class="delivery-wrapper">
             <span class="title">送达时间</span>
-            <span class="delivery">30分钟</span>
+            <span class="delivery">{{info.deliveryTime}}分钟</span>
           </div>
         </div>
       </div>
 
-      <div class="split"></div>
+      <Split/>
 
-      <div>RatingSelect组件</div>
+      <RatingFilter :selectRateType="selectRateType"
+                    :onlyContent="onlyContent"
+                    @setSelectRateType='setSelectRateType'
+                    @switchOnlyContent="switchOnlyContent"
+
+      />
 
       <div class="rating-wrapper">
         <ul>
-          <li class="rating-item">
+          <li class="rating-item" v-for="(rating, index) in filterRatings" :key="index">
             <div class="avatar">
-              <img width="28" height="28" src="http://static.galileo.xiaojukeji.com/static/tms/default_header.png">
+              <img width="28" height="28" :src="rating.avatar">
             </div>
             <div class="content">
-              <h1 class="name">xxx</h1>
+              <h1 class="name">{{rating.username}}</h1>
               <div class="star-wrapper">
-                <div>Star组件</div>
-                <span class="delivery">30</span>
+                <div>
+                  <Star :score="rating.score" :size="24"/>
+                </div>
+                <span class="delivery">{{rating.deliveryTime}}</span>
               </div>
-              <p class="text">还可以</p>
+              <p class="text">{{rating.text}}</p>
               <div class="recommend">
-                <span class="iconfont icon-thumb_up"></span>
+                <span class="iconfont" :class="rating.rateType===0?'icon-thumb_up':'icon-thumb_down'"></span>
+                <span class="item" v-for="(item, index) in rating.recommend" :key="index">{{item}}</span>
               </div>
-              <div class="time">2016-12-11 12:02:13</div>
+              <div class="time">{{rating.rateTime | date-format}}</div>
             </div>
           </li>
         </ul>
@@ -55,22 +63,94 @@
 </template>
 
 <script>
+  import BScroll from 'better-scroll'
   import {mapState} from 'vuex'
 
   import Star from '../../../components/Star/Star'
+  import RatingFilter from '../../../components/RatingFilter/RatingFilter'
 
   export default {
 
-    mounted(){
-      this.$store.dispatch('getRatings')
+    data() {
+      return {
+        selectRateType: 2, // 0代表满意，1代表不满意，2代表全部
+        onlyContent: true, // 是否只显示有text内容
+      };
+    },
+
+    mounted() {
+      this.$store.dispatch('getRatings', () => {
+        this.$nextTick(() => { // 将回调延迟到下次 DOM 更新循环之后执行
+          new BScroll('.ratings', {
+            click: true
+          })
+        })
+      })
+    },
+
+    methods: {
+      // 设置selectRateType的新值
+      setSelectRateType(selectRateType) {
+        return this.selectRateType = selectRateType
+      },
+
+      switchOnlyContent() {
+        return this.onlyContent = !this.onlyContent
+      }
     },
 
     computed: {
-      ...mapState(['ratings'])
+      ...mapState(['ratings', 'info']),
+
+      /*// 过滤后的评论列表
+      filterRatings() {
+        // 取出相关数据
+        const {ratings, selectRateType, onlyContent} = this
+        // console.log(ratings);
+
+        // 返回过滤后的数组
+        return ratings.filter(rating => {
+          const {rateType, text} = rating
+
+          /!*
+          条件1：
+          selectRateType 0/1/2
+          rateType 0/1
+
+          selectRateType === 2 --> 全部
+          selectRateType === rateType
+          selectRateType === 2 || selectRateType === rateType
+           *!/
+
+          /!*
+          条件2：
+          onlyContent true/false
+          text 有值/没值
+
+          onlyContent === false --> 没有勾选只看有内容的评价
+          text.length > 0
+          !onlyContent || text.length > 0
+           *!/
+
+          return (selectRateType === 2 || selectRateType === rateType) && (!onlyContent || text.length > 0)
+        })
+      }*/
+
+      // 过滤后的评论列表
+      filterRatings() {
+        const {ratings, selectRateType, onlyContent} = this;
+
+        return ratings.filter(rating => {
+          const {rateType, text} = rating;
+
+          return (selectRateType === 2 || selectRateType === rateType) && (!onlyContent || text.length > 0)
+        })
+      }
     },
 
     components: {
-      Star
+      Star,
+      RatingFilter
     }
   }
 </script>
@@ -80,11 +160,12 @@
 
   .ratings
     position: absolute
-    top: 2.33rem
+    top: 2.5rem
     bottom: 0
     left: 0
     width: 100%
     overflow: hidden
+    background #fff
     .overview
       display: flex
       padding: 18px 0
@@ -125,6 +206,7 @@
             vertical-align: top
             font-size: 12px
             color: rgb(7, 17, 27)
+            float left
           .star
             display: inline-block
             margin: 0 12px
