@@ -2,6 +2,8 @@
 vuex的mutations模块
 mutation由action触发调用: commit('mutationName')
  */
+import Vue from 'vue';
+
 import {
   RECEIVE_ADDRESS,
   RECEIVE_CATEGORYS,
@@ -10,7 +12,9 @@ import {
   RESET_USER,
   RECEIVE_GOODS,
   RECEIVE_RATINGS,
-  RECEIVE_INFO
+  RECEIVE_INFO,
+  INCREASE_FOOD_COUNT,
+  DECREASE_FOOD_COUNT
 } from './mutation-types'
 
 export default {
@@ -40,4 +44,19 @@ export default {
   [RECEIVE_INFO](state, {info}){
     state.info = info
   },
+
+  [INCREASE_FOOD_COUNT](state, {food}){
+    if(food.count){
+      food.count++
+    }else{
+      Vue.set(food,'count',1)
+    }
+    // console.log(food.count);
+  },
+  [DECREASE_FOOD_COUNT](state, {food}){
+    if(food.count){
+      food.count--
+    }
+  }
+  ,
 }

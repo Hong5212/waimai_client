@@ -6,7 +6,9 @@ import {
   RESET_USER,
   RECEIVE_GOODS,
   RECEIVE_RATINGS,
-  RECEIVE_INFO
+  RECEIVE_INFO,
+  INCREASE_FOOD_COUNT,
+  DECREASE_FOOD_COUNT
 } from './mutation-types'
 import {
   reqAddress,
@@ -108,4 +110,14 @@ export default {
       commit(RECEIVE_INFO, {info})
     }
   },
+
+  // 同步更新food
+  updateFoodCount({commit}, {food, isAdd}){
+    if(isAdd){
+      commit(INCREASE_FOOD_COUNT, {food})
+    }else{
+      commit(DECREASE_FOOD_COUNT, {food})
+    }
+    // console.log(food);
+  }
 }
