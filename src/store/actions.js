@@ -6,7 +6,9 @@ import {
   RESET_USER,
   RECEIVE_GOODS,
   RECEIVE_RATINGS,
-  RECEIVE_INFO
+  RECEIVE_INFO,
+  INCREASE_FOOD_COUNT,
+  DECREASE_FOOD_COUNT
 } from './mutation-types'
 import {
   reqAddress,
@@ -79,32 +81,45 @@ export default {
   },
 
   // 异步获取点餐分类列表
-  async getGoods({commit, state}) {
+  async getGoods({commit, state}, callback) {
     // 调用接口请求函数从后台获取数据
     const reslut = await reqGoods()  // {code: 0, data: []}
     if (reslut.code === 0) {
       const goods = reslut.data
-      commit(RECEIVE_GOODS, {goods})
+      commit(RECEIVE_GOODS, {goods});
+      callback && callback();
     }
   },
 
   // 异步获取评论列表
-  async getRatings({commit, state}) {
+  async getRatings({commit, state}, callback) {
     // 调用接口请求函数从后台获取数据
     const reslut = await reqRatings()  // {code: 0, data: []}
     if (reslut.code === 0) {
       const ratings = reslut.data
-      commit(RECEIVE_RATINGS, {ratings})
+      commit(RECEIVE_RATINGS, {ratings});
+      callback && callback();
     }
   },
 
   // 异步获取商家消息
-  async getInfo({commit, state}) {
+  async getInfo({commit, state}, callback) {
     // 调用接口请求函数从后台获取数据
     const reslut = await reqInfo()  // { code: 0, data: {} }
     if (reslut.code === 0) {
       const info = reslut.data
       commit(RECEIVE_INFO, {info})
+      callback && callback();
     }
   },
+
+  // 同步更新food
+  updateFoodCount({commit}, {food, isAdd}){
+    if(isAdd){
+      commit(INCREASE_FOOD_COUNT, {food})
+    }else{
+      commit(DECREASE_FOOD_COUNT, {food})
+    }
+    // console.log(food);
+  }
 }
