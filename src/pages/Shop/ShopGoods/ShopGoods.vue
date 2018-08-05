@@ -65,8 +65,8 @@
   import ShopCart from '../../../components/ShopCart/ShopCart'
 
   export default {
-    data(){
-      return{
+    data() {
+      return {
         scrollY: 0, // 右侧列表滚动的y坐标
         tops: [],   // 右侧所有分类<li>的top组成的数组
         food: {}    // 需要显示的当前food
@@ -74,8 +74,8 @@
     },
 
     mounted() {
-      this.$store.dispatch('getGoods',()=>{
-        this.$nextTick(()=>{
+      this.$store.dispatch('getGoods', () => {
+        this.$nextTick(() => {
           this._initTop();
           // 初始化scroll
           this._initScroll();
@@ -87,14 +87,14 @@
       ...mapState(['goods']),
 
       // 当前分类的下标
-      currentIndex(){
+      currentIndex() {
         const {scrollY, tops} = this;
         // scrollY>=top && scrollY<nextTop
         // 得到当前分类的下标
         // return tops.findIndex((top, index) => scrollY >= top && scrollY < tops[index + 1])
 
         // 得到当前分类的下标
-        const index =  tops.findIndex((top, index) => scrollY >= top && scrollY < tops[index + 1])
+        const index = tops.findIndex((top, index) => scrollY >= top && scrollY < tops[index + 1])
 
         this._scrollLeftList(index)
 
@@ -104,7 +104,7 @@
 
     methods: {
       // 统计分类<li>的top
-      _initTop(){
+      _initTop() {
         const tops = [];
         let top = 0;
         tops.push(top);
@@ -120,16 +120,16 @@
         // console.log(this.tops);
       },
 
-      _initScroll(){
+      _initScroll() {
         // 为左侧列表创建scroll对象
         this.leftScroll = new BScroll('.menu-wrapper', {
-          click:true,
+          click: true,
         });
 
         // 为右侧列表创建scroll对象
         this.rightScroll = new BScroll('.foods-wrapper', {
           probeType: 1,  // 只有手指触摸滑动(一定距离)
-          click:true,
+          click: true,
         })
 
         // better-scroll禁用了原生的dom事件, 所有事件都自定义实现
@@ -146,8 +146,8 @@
       },
 
       // 滚动左侧列表到指定下标对应的位置
-      _scrollLeftList(index){
-        if(this.leftScroll){
+      _scrollLeftList(index) {
+        if (this.leftScroll) {
           // 得到当前分类的<li>
           const li = this.$refs.menuUl.children[index]
 
@@ -155,7 +155,7 @@
         }
       },
 
-      clickItem(index){
+      clickItem(index) {
         // 得到index对应的top
         const top = this.tops[index]
         // 立即更新scrollY
@@ -164,7 +164,7 @@
         this.rightScroll.scrollTo(0, -top, 300)
       },
 
-      showFood(food){
+      showFood(food) {
         // 更新food状态
         this.food = food
 
