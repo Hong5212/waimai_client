@@ -2,55 +2,124 @@
   <div>
     <div class="shopcart">
       <div class="content">
-        <div class="content-left">
+        <div class="content-left" @click="toggleShow">
           <div class="logo-wrapper">
-            <div class="logo highlight">
+            <div class="logo" :class="{ highlight: cartFoodCount}">
               <i class="iconfont icon-shopping_cart" :class="{ highlight: cartFoodCount}"></i>
             </div>
             <div class="num" v-show="cartFoodCount">{{cartFoodCount}}</div>
           </div>
-          <div class="price" :class="{ highlight: cartFoodPrice}">{{cartFoodCount}}</div>
+          <div class="price" :class="{ highlight: cartFoodPrice}">{{cartFoodPrice}}</div>
           <div class="desc" :class="{ highlight: cartFoodPrice}">另需配送费￥{{info.deliveryPrice}}元</div>
         </div>
         <div class="content-right">
-          <div class="pay not-enough">
-            还差￥10元起送
+          <div class="pay" :class="payClass">
+            {{payText}}
           </div>
         </div>
       </div>
-      <div class="shopcart-list" style="display: none;">
+
+      <div class="shopcart-list" v-show="listShow">
         <div class="list-header">
           <h1 class="title">购物车</h1>
           <span class="empty">清空</span>
         </div>
-        <div class="list-content">
+        <div class="list-content" ref="list">
           <ul>
-            <li class="food">
-              <span class="name">红枣山药糙米粥</span>
-              <div class="price"><span>￥10</span></div>
+            <li class="food" v-for="(food, index) in cartFoods" :key="index">
+              <span class="name">{{food.name}}</span>
+              <div class="price"><span>￥{{food.price}}</span></div>
               <div class="cartcontrol-wrapper">
-                <div class="cartcontrol">
-                  <div class="iconfont icon-remove_circle_outline"></div>
-                  <div class="cart-count">1</div>
-                  <div class="iconfont icon-add_circle"></div>
-                </div>
+                <CartControl :food="food"/>
               </div>
             </li>
           </ul>
         </div>
       </div>
     </div>
-    <div class="list-mask" style="display: none;"></div>
+    <div class="list-mask" v-show="listShow" @click="toggleShow"></div>
   </div>
 </template>
 
 <script>
   import {mapState, mapGetters} from 'vuex'
+  import BScroll from 'better-scroll'
+
+  import CartControl from '../CartControl/CartControl'
 
   export default {
+    data(){
+      return{
+        isShow: false,
+      }
+    },
+
     computed: {
-      ...mapState(['cartFood', 'info']),
-      ...mapGetters(['cartFoodCount', 'cartFoodPrice'])
+      ...mapState(['cartFoods', 'info']),
+      ...mapGetters(['cartFoodCount', 'cartFoodPrice']),
+
+      payText(){
+        const {minPrice} = this.info
+        const {cartFoodPrice} = this
+        if(cartFoodPrice === 0){
+          return `￥${minPrice}元起送`
+        }else if(cartFoodPrice < minPrice){
+          return `还差￥${minPrice - cartFoodPrice}元起送`
+        }else{
+          return `去结算`
+        }
+      },
+
+      payClass(){
+        const {minPrice} = this.info
+        const {cartFoodPrice} = this
+        return cartFoodPrice >= minPrice ? 'enough': 'not-enough'
+      },
+
+      // 购物车列表是否显示
+      listShow(){
+        // 如果没有数量直接隐藏
+        if(this.cartFoodCount === 0){
+          // 将isShow设置为false
+          this.isShow = false
+          return false
+        }
+
+        if(this.isShow){
+          this.$nextTick(()=>{
+            /*
+            实现单例对象
+            1. 创建对象之前，先要判断不存在
+            2. 创建对象之后，保存对象
+             */
+            if(!this.scroll){
+              console.log('-----');
+              this.scroll =  new BScroll(this.$refs.list, {
+                click: true
+              })
+            }else{
+              // 通知scroll刷新( 重新进行计算 )
+              this.scroll.refresh()
+            }
+          })
+        }
+
+        // 如果数量大于0，看isShow即可
+        return this.isShow
+      }
+    },
+
+    methods: {
+      toggleShow(){
+        // 只有当有数量时才切换
+        if(this.cartFoodCount){
+          this.isShow = !this.isShow
+        }
+      }
+    },
+
+    components: {
+      CartControl
     }
   }
 </script>
@@ -149,6 +218,7 @@
       top: 0
       z-index: -1
       width: 100%
+      transform translateY(-100%)
       .list-header
         height: 40px
         line-height: 40px

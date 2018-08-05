@@ -8,5 +8,5 @@ export default {
   goods: [], // 点餐
   ratings: [], // 评论
   info: {}, // 商家消息
-  cartFood: [] //购物车中的购物项数组
+  cartFoods: [] //购物车中的购物项数组
 }

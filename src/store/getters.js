@@ -11,11 +11,11 @@ export default {
 
   // 购物车中 food 的总数量
   cartFoodCount(state){
-    return state.cartFood.reduce((preCount, food) => preCount + food.count, 0)
+    return state.cartFoods.reduce((preCount, food) => preCount + food.count, 0)
   },
 
   // 购物车中 food 的总数量
   cartFoodPrice(state){
-    return state.cartFood.reduce((preCount, food) => preCount + food.count * food.price, 0)
+    return state.cartFoods.reduce((preCount, food) => preCount + food.count * food.price, 0)
   }
 }
