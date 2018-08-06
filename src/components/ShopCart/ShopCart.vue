@@ -95,7 +95,7 @@
             2. 创建对象之后，保存对象
              */
             if(!this.scroll){
-              console.log('-----');
+              // console.log('-----');
               this.scroll =  new BScroll(this.$refs.list, {
                 click: true
               })
