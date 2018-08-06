@@ -8,6 +8,7 @@
   import FooterGuide from './components/FooterGuide/FooterGuide'
 
   export default {
+    // 已挂载
     mounted(){
       // 异步获取当前地址信息
       this.$store.dispatch('getAddress')
