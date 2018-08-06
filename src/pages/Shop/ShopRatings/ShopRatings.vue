@@ -102,7 +102,7 @@
     computed: {
       ...mapState(['ratings', 'info']),
 
-      /*// 过滤后的评论列表
+      // 过滤后的评论列表
       filterRatings() {
         // 取出相关数据
         const {ratings, selectRateType, onlyContent} = this
@@ -112,7 +112,7 @@
         return ratings.filter(rating => {
           const {rateType, text} = rating
 
-          /!*
+          /*
           条件1：
           selectRateType 0/1/2
           rateType 0/1
@@ -120,9 +120,9 @@
           selectRateType === 2 --> 全部
           selectRateType === rateType
           selectRateType === 2 || selectRateType === rateType
-           *!/
+           */
 
-          /!*
+          /*
           条件2：
           onlyContent true/false
           text 有值/没值
@@ -130,18 +130,7 @@
           onlyContent === false --> 没有勾选只看有内容的评价
           text.length > 0
           !onlyContent || text.length > 0
-           *!/
-
-          return (selectRateType === 2 || selectRateType === rateType) && (!onlyContent || text.length > 0)
-        })
-      }*/
-
-      // 过滤后的评论列表
-      filterRatings() {
-        const {ratings, selectRateType, onlyContent} = this;
-
-        return ratings.filter(rating => {
-          const {rateType, text} = rating;
+           */
 
           return (selectRateType === 2 || selectRateType === rateType) && (!onlyContent || text.length > 0)
         })
