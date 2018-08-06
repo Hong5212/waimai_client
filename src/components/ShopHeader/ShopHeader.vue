@@ -20,8 +20,7 @@
           <span class="shop-message-detail">{{info.deliveryPrice}}</span>
           <span class="shop-message-detail">月售{{info.sellCount}}单</span>
           <span class="shop-message-detail">
-            {{info.description}}
-            <span>约{{info.deliveryTime}}分钟</span>
+            {{info.description}}<span>约{{info.deliveryTime}}分钟</span>
           </span>
           <span class="shop-message-detail">距离{{info.distance}}</span>
         </div>

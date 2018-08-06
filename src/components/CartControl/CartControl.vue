@@ -1,11 +1,11 @@
 <template>
-  <transition name="move">
-    <div class="cartcontrol">
-      <div class="iconfont icon-remove_circle_outline" v-show="food.count" @click="updateFoodCount(false)"></div>
+  <div class="cartcontrol">
+    <transition name="move">
+      <div class="iconfont icon-remove_circle_outline" v-show="food.count" @click.stop="updateFoodCount(false)"></div>
+    </transition>
       <div class="cart-count" v-show="food.count">{{food.count}}</div>
-      <div class="iconfont icon-add_circle" @click="updateFoodCount(true)"></div>
-    </div>
-  </transition>
+      <div class="iconfont icon-add_circle" @click.stop="updateFoodCount(true)"></div>
+  </div>
 </template>
 
 <script>
@@ -16,7 +16,7 @@
     },
 
     methods: {
-      updateFoodCount(isAdd){ // 是否增加1
+      updateFoodCount(isAdd) { // 是否增加1
 
         const {food} = this;
 
@@ -44,9 +44,11 @@
       line-height 24px
       font-size 24px
       color $green
-      /*&.enter-active-move, &.leave-active-move
+      &.move-enter-active, &.move-leave-active
         transition all .3s
-        &.enter-to-move, &.enter-to-*/
+      &.move-enter, &.move-leave-to
+        opacity 0
+        transform translateX(30px) rotate(360deg)
     .cart-count
       display: inline-block
       vertical-align: top
