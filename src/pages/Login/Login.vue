@@ -183,6 +183,15 @@
         // 参数本身后台不需要, 但有了这个变化的值, 浏览器就会自动发请求
         this.$refs.captcha.src = 'http://localhost:4000/captcha?time=' + Date.now()
       }
+    },
+
+    // 组件的前置守卫
+    beforeRouteEnter(to, from, next){
+      next(vm => { // vm是当前组件对象
+        if(vm.$store.state.user._id){
+          next(from.path || '/profile')
+        }
+      })
     }
   }
 </script>

@@ -90,10 +90,18 @@
         </div>
       </a>
     </section>
+
     <section class="profile_my_order border-1px" v-show="user._id">
       <!-- 退出登录 -->
       <mt-button style="width: 100%" type="danger" @click="logout">退出登录</mt-button>
     </section>
+
+    <!-- test -->
+    <hr/>
+    <router-link to="/a">AAA</router-link>
+    <router-link to="/b">BBB</router-link>
+    <router-link to="/login">登录</router-link>
+
   </section>
 </template>
 <script>
@@ -125,7 +133,7 @@
 
     components: {
       MtButton,
-      HeaderTop
+      HeaderTop,
     }
   }
 </script>
