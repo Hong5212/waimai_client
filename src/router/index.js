@@ -32,6 +32,7 @@ import b2 from '../pages/test/b2'
 Vue.use(VueRouter)
 
 const router = new VueRouter({
+  // mode: 'history', // 去掉地址栏中的#号
   routes: [
     {
       path: '/msite',
@@ -105,8 +106,10 @@ const router = new VueRouter({
   ]
 })
 
+// console.log(Vue.$store); // undefined
 router.beforeEach((to, from, next) => {
-  console.log('beforeEach', to, from, Vue.$store);
+  // console.log('beforeEach', to, from, Vue.$store);
+  // console.log(Vue);
   /*const userid = Vue.$store.state.user._id
   const {path} = to
   if(!userid && (path === '/a' || path === '/b')){
